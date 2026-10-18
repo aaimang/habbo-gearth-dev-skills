@@ -330,6 +330,12 @@ def main(argv: list[str] | None = None) -> int:
 
     sock.sendall(frame(CONNECTION_END))
     time.sleep(0.2)
+    # shutdown() sends FIN even while our reader thread is blocked in recv(); on Linux a
+    # plain close() from another thread doesn't, and the extension would never see EOF.
+    try:
+        sock.shutdown(socket.SHUT_RDWR)
+    except OSError:
+        pass
     sock.close()
     server.close()
     if proc:

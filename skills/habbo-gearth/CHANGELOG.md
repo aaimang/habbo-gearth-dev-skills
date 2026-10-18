@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1, 2026-10-18
+
+- `fake_gearth.py`: shut the socket down before closing it. On Linux a plain `close()`
+  while the reader thread is blocked in `recv()` sends no FIN, so the extension never
+  saw G-Earth go away and the exit check failed (seen in CI on ubuntu-latest).
+
 ## 1.0.0 (V1), 2026-10-18
 
 First release.

@@ -3,7 +3,7 @@ name: habbo-gearth
 description: Build, modify, debug, test and publish G-Earth extensions for Habbo (G-Python, G-Node, Java, G-Rust, xabbo), and read or write Habbo packets. Covers the extension protocol, packet names vs ids (Sulek), HabboPackets layouts and the live AIR client's drift from them, packet safety / Developer mode, threading rules, installing via command.txt, the macOS .DS_Store crash, G-ExtensionStore submission rules, and reusable templates, scripts and prompts. Use whenever a task mentions G-Earth, G-Python, g_python, HPacket, Habbo packets, headers, packet layouts or hex dumps, intercepting/blocking/injecting packets, a Habbo bot, Sulek, HabboPackets, G-ExtensionStore, extension.json, or a chat bot or room helper running through G-Earth, even if the user only says "my Habbo extension" or "the packet doesn't parse". For room variables over REST (the official WIRED Web API), use habbo-wired-api instead.
 license: Internal knowledge base; links point to third-party projects under their own licenses.
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   release: V1
   updated: "2026-10-18"
   verified-against: "G-Earth 1.5.4 (G-Realm moon), g-python 0.1.6, Habbo AIR MAC63 2026-10 builds, HabboPackets 2026-09, G-ExtensionStore repo/1.5.3"
@@ -186,6 +186,6 @@ with secrets; ask before committing or pushing on someone's behalf.
 
 ## Versioning of this skill
 
-V1 (1.0.0, 2026-10-18). Changes are logged in `CHANGELOG.md`. When a fact here is
+V1 (1.0.1, 2026-10-18). Changes are logged in `CHANGELOG.md`. When a fact here is
 contradicted by a live capture or newer source, the capture wins: fix the reference,
 note the build and date, and bump the version.
