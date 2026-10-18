@@ -1,5 +1,10 @@
 ---
 name: habbo-wired-api
+license: MIT
+compatibility: Agent Skills format (agentskills.io), e.g. Claude Code, Codex, Gemini CLI, Cursor. Scripts need Python 3.9+; live calls need network access to the hotel's /api/public and the room's keys.
+metadata:
+  version: "1.0.1"
+  updated: "2026-10-18"
 description: Build Habbo tools with the official WIRED Web API, covering room variables over REST, X-Wired-Read-Key/X-Wired-Write-Key, variable profiles, batch, bulk delete, the Level Up add-on maths, furni id conversion, 64-bit values as strings, rate limits. Use whenever a task mentions WIRED variables, the Variable Global Add-on Web API, habbo.com /api/public, room variable keys, wired-api-python / wired-api-wrapper-node / habbo-api-wrapper-php or other Habbo Web API wrappers, or a website / Discord bot that reads or writes Habbo room state, even if the user only says "the Habbo API". Not for G-Earth extensions, packets or G-Python (use habbo-gearth for those).
 ---
 
@@ -98,7 +103,7 @@ Semantics that matter:
 ## Combining with a G-Earth extension
 
 All extension knowledge (protocol, packets, G-Python, store, templates, scripts) lives in
-the **`habbo-gearth`** skill (`~/.claude/skills/habbo-gearth/`). From the Web API side,
+the **`habbo-gearth`** skill (a sibling folder next to this one). From the Web API side,
 only this matters: the extension calls the Web API from a **worker thread**, never from
 a packet callback (G-Earth holds the packet while a callback runs), with timeouts and
 429 back-off, and keys stay out of the extension's logs and any published zip.

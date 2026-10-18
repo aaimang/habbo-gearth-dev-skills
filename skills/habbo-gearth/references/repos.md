@@ -68,6 +68,6 @@ installed.
 
 ## Related skill
 
-- `habbo-wired-api` (`~/.claude/skills/habbo-wired-api/`): the official WIRED Web API (room
+- `habbo-wired-api` (a sibling folder next to this skill): the official WIRED Web API (room
   variables over REST). Use it instead of an extension whenever persistent room state is
   the goal.

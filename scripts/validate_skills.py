@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / "skills"
 ALLOWED_KEYS = {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
-NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")  # agentskills.io: no leading/trailing/double hyphens
 # Self-tests that need no network or secrets: (skill, script args, text expected in stdout)
 SELFTESTS = [
     ("habbo-gearth", ["scripts/habbo_packets.py", "selftest"], "selftest OK"),
@@ -58,6 +58,26 @@ def frontmatter(text: str) -> tuple[dict[str, str], list[str]]:
     return keys, errors
 
 
+def metadata_problems(text: str) -> list[str]:
+    """agentskills.io: ``metadata`` maps string keys to string values (quote numbers/dates)."""
+    end = text.find("\n---", 4)
+    block, inside, problems = text[4:end].splitlines(), False, []
+    for line in block:
+        if line.startswith("metadata:"):
+            inside = True
+            continue
+        if inside and line and not line.startswith((" ", "\t")):
+            inside = False
+        if inside and line.strip():
+            key, _, value = line.strip().partition(":")
+            value = value.strip()
+            if not value:
+                problems.append(f"metadata.{key} must be a string, not a nested map")
+            elif re.fullmatch(r"-?\d+(\.\d+)?|true|false|null|\d{4}-\d{2}-\d{2}", value):
+                problems.append(f"metadata.{key}: quote {value!r} so it stays a string")
+    return problems
+
+
 def check_skill(path: Path, run: bool) -> list[str]:
     errors: list[str] = []
     skill_md = path / "SKILL.md"
@@ -75,6 +95,10 @@ def check_skill(path: Path, run: bool) -> list[str]:
         errors.append(f"{path.name}: name must be lowercase-hyphenated, <= 64 chars")
     if not desc or len(desc) > 1024 or "<" in desc or ">" in desc:
         errors.append(f"{path.name}: description must be 1-1024 chars without angle brackets")
+    compat = keys.get("compatibility")
+    if compat is not None and not 1 <= len(compat) <= 500:
+        errors.append(f"{path.name}: compatibility must be 1-500 chars")
+    errors += [f"{path.name}: {p}" for p in metadata_problems(text)]
     lines = text.count("\n")
     if lines > 500:
         errors.append(f"{path.name}: SKILL.md has {lines} lines (keep under 500)")

@@ -47,7 +47,7 @@ new, so expect these to change quickly. Check the last push before copying anyth
 
 ## G-Earth ecosystem
 
-Moved to the `habbo-gearth` skill: `~/.claude/skills/habbo-gearth/references/repos.md`
+Moved to the `habbo-gearth` skill: `habbo-gearth/references/repos.md` (sibling folder)
 (G-Earth, frameworks, HabboPackets, Sulek, G-ExtensionStore).
 
 ## Extension side

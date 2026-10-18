@@ -60,7 +60,7 @@ def test_truncated():
 ## 4. End-to-end without Habbo
 
 ```bash
-python3 ~/.claude/skills/habbo-gearth/scripts/fake_gearth.py \
+python3 <skills-dir>/habbo-gearth/scripts/fake_gearth.py \
   --run "$PWD/.venv/bin/python -m my_ext -p {port} -c TEST -f test --project-dir $PWD" \
   --intercept '{out:Chat}{s:"!ping"}{i:0}{i:-1}' \
   --intercept '{out:Chat}{s:"hello"}{i:0}{i:-1}' \

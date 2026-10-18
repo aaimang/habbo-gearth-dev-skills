@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2, 2026-10-18
+
+- Works with any Agent Skills client (Claude Code, Codex, Gemini CLI, Cursor):
+  `license: MIT` and a `compatibility` line in the frontmatter, agent-neutral wording
+  and paths (no `~/.claude/...`).
+
 ## 1.0.1, 2026-10-18
 
 - `fake_gearth.py`: shut the socket down before closing it. On Linux a plain `close()`

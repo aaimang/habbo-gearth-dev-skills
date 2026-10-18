@@ -96,7 +96,7 @@ G-Earth ── socket ──> G-Python reader ──> packet thread ──> guar
                                                               │ update small in-memory state (lock)
                                                               └─> queue.put(job) ─────────────┐
                                                                                               v
-   worker pool (ThreadPoolExecutor, 1-2 workers): slow work (Claude, HTTP), gated by
+   worker pool (ThreadPoolExecutor, 1-2 workers): slow work (LLM APIs, HTTP), gated by
    whitelist -> cooldown -> budget -> queue size, cheapest check first
                                                               │
                                                               v

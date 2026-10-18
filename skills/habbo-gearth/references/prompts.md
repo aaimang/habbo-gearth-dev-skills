@@ -1,6 +1,6 @@
 # Reusable prompts
 
-Two kinds: **developer prompts** (paste into Claude Code to drive work on an extension)
+Two kinds: **developer prompts** (paste into your coding agent, e.g. Claude Code, Codex, Gemini CLI or Cursor, to drive work on an extension)
 and **runtime prompts** (system prompts for LLM features inside an extension). Replace
 `<...>` placeholders. Each developer prompt already names the skill pieces to use, so
 the work starts in the right place.

@@ -1,8 +1,9 @@
 # habbo-gearth-dev-skills
 
 Agent skills for building tools for the hotel game: G-Earth extensions, packet work,
-G-Python, and the official WIRED Web API. Written for Claude Code (they're plain
-`SKILL.md` folders, so any agent that reads skills can use them).
+G-Python, and the official WIRED Web API. They follow the open
+[Agent Skills](https://agentskills.io) format (a folder with a `SKILL.md`), so they work
+in Claude Code, Codex, Gemini CLI, Cursor and any other agent that supports it.
 
 > Unofficial fan project, not affiliated with or endorsed by Sulake Oy.
 > G-Earth sits between the game client and the hotel; using it breaks the game's Terms
@@ -12,26 +13,37 @@ G-Python, and the official WIRED Web API. Written for Claude Code (they're plain
 
 | Skill | Version | What it covers |
 |---|---|---|
-| [`habbo-gearth`](skills/habbo-gearth/) | 1.0.1 | G-Earth extensions end to end: the extension protocol, packet names vs ids (Sulek), HabboPackets layouts and how the live client differs from them, packet safety, G-Python threading rules, installing, the macOS `.DS_Store` crash, publishing to G-ExtensionStore. Comes with a tested G-Python project template and scripts to look up and decode packets, fake G-Earth for tests, scaffold projects and validate store entries |
-| [`habbo-wired-api`](skills/habbo-wired-api/) | 1.0.0 | The official WIRED Web API: room variables over REST, read/write keys, profiles, batch, bulk delete, Level Up maths, furni id conversion, 64-bit values, rate limits. Includes the API spec notes, wrapper notes and helper scripts |
+| [`habbo-gearth`](skills/habbo-gearth/) | 1.0.2 | G-Earth extensions end to end: the extension protocol, packet names vs ids (Sulek), HabboPackets layouts and how the live client differs from them, packet safety, G-Python threading rules, installing, the macOS `.DS_Store` crash, publishing to G-ExtensionStore. Comes with a tested G-Python project template and scripts to look up and decode packets, fake G-Earth for tests, scaffold projects and validate store entries |
+| [`habbo-wired-api`](skills/habbo-wired-api/) | 1.0.1 | The official WIRED Web API: room variables over REST, read/write keys, profiles, batch, bulk delete, Level Up maths, furni id conversion, 64-bit values, rate limits. Includes the API spec notes, wrapper notes and helper scripts |
 
-## Install (Claude Code)
-
-Clone, then link each skill into your skills folder so updates arrive with `git pull`:
+## Install
 
 ```bash
 git clone https://github.com/aaimang/habbo-gearth-dev-skills.git
 cd habbo-gearth-dev-skills
-mkdir -p ~/.claude/skills
-ln -s "$PWD/skills/habbo-gearth" ~/.claude/skills/habbo-gearth
-ln -s "$PWD/skills/habbo-wired-api" ~/.claude/skills/habbo-wired-api
+python3 scripts/install_skills.py
 ```
 
-On Windows, copy the folders into `%USERPROFILE%\.claude\skills\` instead.
-For a single project, put them in that project's `.claude/skills/`.
+That links both skills into `~/.agents/skills` and `~/.claude/skills`, which covers:
 
-Claude picks a skill when a request matches its description (for example "my G-Earth
-extension's packet doesn't parse" or "read a room variable with the Web API").
+| Agent | Reads skills from |
+|---|---|
+| Codex | `~/.agents/skills`, or `.agents/skills` in a repo |
+| Gemini CLI | `~/.agents/skills` (alias of `~/.gemini/skills`), or `.agents/skills` in a workspace |
+| Cursor | `~/.agents/skills`, `~/.cursor/skills`, and the Claude / Codex folders |
+| Claude Code | `~/.claude/skills`, or `.claude/skills` in a project |
+
+Links mean a `git pull` updates every agent at once. Options:
+
+- One agent only: `--target agents` (Codex, Gemini CLI, Cursor) or `--target claude`.
+- One project only: `--dest path/to/project/.agents/skills` (or `.claude/skills`).
+- Windows without symlink rights: add `--copy` (re-run after each `git pull`).
+- Remove: `--uninstall`. Preview anything with `--dry-run`.
+
+Or copy the folders in `skills/` by hand to any of the paths above. Restart the agent
+(or start a new session) afterwards. It picks a skill when a request matches the
+skill's description, for example "my G-Earth extension's packet doesn't parse" or "read
+a room variable with the Web API"; you can also ask for it by name.
 
 ## Requirements
 
@@ -57,9 +69,11 @@ python3 skills/habbo-wired-api/scripts/furni_ids.py
 1. Edit a skill; keep `SKILL.md` under 500 lines and put detail in `references/`.
 2. If a live capture or newer source contradicts a reference, fix it, note the client
    build and date, and bump the skill's `metadata.version` and `CHANGELOG.md`.
-3. Run `python3 scripts/validate_skills.py` (CI runs it too, plus the template on
+3. Keep skills agent-neutral: no agent-specific paths or tool names in `SKILL.md`, and
+   frontmatter limited to the [spec](https://agentskills.io/specification) fields.
+4. Run `python3 scripts/validate_skills.py` (CI runs it too, plus the template on
    Linux, macOS and Windows).
-4. Never commit keys, env files, logs, or packet captures with other players' names.
+5. Never commit keys, env files, logs, or packet captures with other players' names.
 
 ## Sources
 
