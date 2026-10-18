@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate skills and run script self-tests
+        run: python3 scripts/validate_skills.py
+
+  template:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v6
+      - name: Scaffold a project from the G-Python template
+        run: python skills/habbo-gearth/scripts/scaffold.py --title "Template Check" --dest "${{ runner.temp }}/template-check" --author ci
+        shell: bash
+      - name: Test, lint and dry-run the installer
+        working-directory: ${{ runner.temp }}/template-check
+        shell: bash
+        run: |
+          uv sync
+          uv run pytest -q
+          uv run ruff check .
+          uv run ruff format --check .
+          mkdir -p fake-gearth/Extensions
+          uv run python scripts/install_gearth.py --gearth-dir fake-gearth --dry-run
+      - name: End to end against the fake G-Earth
+        if: runner.os != 'Windows'
+        working-directory: ${{ runner.temp }}/template-check
+        shell: bash
+        run: |
+          python "$GITHUB_WORKSPACE/skills/habbo-gearth/scripts/fake_gearth.py" \
+            --run "$PWD/.venv/bin/python -m template_check -p {port} -c CI -f ci --project-dir $PWD" \
+            --intercept '{out:Chat}{s:"!ping"}{i:0}{i:-1}' \
+            --intercept '{out:Chat}{s:"!say hello"}{i:0}{i:-1}' \
+            --intercept '{out:Chat}{s:"hi"}{i:0}{i:-1}'
