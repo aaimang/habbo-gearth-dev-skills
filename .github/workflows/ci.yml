@@ -60,6 +60,8 @@ jobs:
         run: |
           python "$GITHUB_WORKSPACE/skills/habbo-gearth/scripts/fake_gearth.py" \
             --run "$PWD/.venv/bin/python -m template_check -p {port} -c CI -f ci --project-dir $PWD" \
+            --packet 'in:NotificationDialog=1992' \
             --intercept '{out:Chat}{s:"!ping"}{i:0}{i:-1}' \
+            --intercept '{out:Chat}{s:"!help"}{i:0}{i:-1}' \
             --intercept '{out:Chat}{s:"!say hello"}{i:0}{i:-1}' \
             --intercept '{out:Chat}{s:"hi"}{i:0}{i:-1}'

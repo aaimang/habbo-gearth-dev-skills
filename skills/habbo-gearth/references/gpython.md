@@ -45,7 +45,7 @@ ext.intercept(Direction.TO_CLIENT, callback, "Chat")       # by NAME; mode="defa
 ext.on_event("connection_start", fn)                         # also: init, connection_end, double_click
 ext.start()                                                  # blocks until INIT (and CONNECTION_START if G-Earth asks)
 ext.send_to_server(HPacket("Chat", "hi", 0, -1))             # returns None: you're never told if it was dropped
-ext.send_to_client(HPacket("Whisper", ...))                  # only your client sees it
+ext.send_to_client(HPacket("Whisper", ...))                  # only your client sees it; also returns None
 ext.write_to_console("text", "blue")                         # G-Earth's extension console
 ext.connection_info  # {host, port, hotel_version, client_identifier, client_type} or None
 ext.packet_infos     # {Direction: {id|name|hash: [ {Id, Name, Hash, Structure, Source} ]}} or None
@@ -155,7 +155,7 @@ Proven details:
 | `hash is not 'NULL'` | `'NULL'` never becomes `None`; SyntaxWarning on 3.12+ | harmless; silence via the shim |
 | `htools.RoomUsers` sends `GetHeightMap` | packet no longer exists in AIR | track users yourself from `Users` / `UserRemove`; rejoin with `GetGuestRoom(id, 0, 1)` |
 | `hparsers` (`HEntity`, `HUserUpdate`) | documented layouts + Latin-1; break on live drift | own parsers with layout variants |
-| Sending before `connection_start`, or an unknown name | dropped with a line on stderr only (`send_*` returns None) | queue until connected; check names on connect; drop the queue on `connection_end` |
+| Sending before `connection_start`, or an unknown name | dropped with a line on stderr only (`Could not send incomplete packet`); `send_to_server` and `send_to_client` never raise and return None (the internal `__send` returns False, the public methods drop it) | queue until connected; check the name in `ext.packet_infos[direction]` before each send; drop the queue on `connection_end`. For client windows, fall back to `write_to_console` (`client-ui.md` section 8) |
 | `send_to_server("{expr}")` | round trip to G-Earth to convert | build `HPacket` locally |
 
 ## 7. A minimal correct extension

@@ -33,9 +33,12 @@ Then restart G-Earth, and start the Habbo client through G-Earth again.
 |---|---|
 | `!ping` | Nobody sees it; G-Earth's console answers "pong" |
 | `!say hello` | Nobody sees `!say`; you say "hello" |
+| `!help` | Nobody sees it; a popup with the commands opens in your client (only you see it) |
 
 If sending does nothing, turn on **Developer mode** in G-Earth's Extra tab, or do the
-action once by hand: G-Earth only lets extensions send packet types it has seen.
+action once by hand: G-Earth only lets extensions send packet types it has seen. The
+`!help` popup needs Developer mode on; without it the commands show in G-Earth's
+console instead.
 
 ## Update
 

@@ -15,6 +15,7 @@ For the Habbo **AIR client** (G-Earth `FLASH`) unless noted. Ids shown are from 
 9. Avatar action packets and value tables
 10. Tiles, floor map, doors, directions
 11. Other packets worth knowing
+12. Client UI packets (sent to your own client)
 
 ## 1. Wire format
 
@@ -234,3 +235,16 @@ Look these up with `habbo_packets.py show` before use; confirm with a capture.
 | Room moderation (as room owner) | `KickUser`, `MuteUser`, `BanUserWithDuration`, `RemoveRights`, `GetBannedUsersFromRoom` (out); `BannedUsersFromRoom` (in) |
 
 `habbo_packets.py search <text> --templates` finds names and shared structures.
+
+## 12. Client UI packets (sent to your own client)
+
+Incoming packets an extension makes up and sends with `send_to_client`; only that
+client sees them. Live-checked on AIR MAC63-202610151745-513993601, 2026-10-19, with
+G-Earth Developer mode on. Details, screenshots and rules: `client-ui.md`.
+
+| Name | Dir | Layout | Notes |
+|---|---|---|---|
+| `NotificationDialog` | in | `s type, i[s key, s value]` | **Live-verified.** `display=BUBBLE`: top-right toast, keys `message`, `image`; tags printed raw. `display=POP_UP`: window, keys `title`, `message`, `image`, `linkUrl` + `linkTitle`; `\n`, `<b>`, `<i>`, `<u>`, `<font color>` work |
+| `MOTDNotification` | in | `i[s]` | **Live-verified.** "Messages for you" window, one string per page; plain text only (tags printed raw), line breaks work |
+| `HabboBroadcast` | in | `s` | modal alert; not live-tested |
+| `InClientLink` | in | `s` | opens a built-in client window; not live-tested |

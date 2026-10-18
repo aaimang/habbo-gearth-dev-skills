@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.1.0, 2026-10-19
+
+- New `references/client-ui.md`: showing UI inside the client from an extension. What
+  is not possible (custom windows, patching the client), the incoming packets that are
+  (`NotificationDialog`, `MOTDNotification`, `HabboBroadcast`, `InClientLink`), live
+  results with redacted screenshots (`assets/client-ui/`), image URLs, and the rules
+  from shipping it (owner commands, a notify thread, throttling, name check, console
+  fallback). Live-tested on AIR MAC63-202610151745-513993601, 2026-10-19, with
+  Developer mode on only.
+- `SKILL.md`: workflow G (show something in the client), reference map entry,
+  description keywords.
+- Template: `hotelui.py` (bubble and popup builders, `escape`, `HotelNotifier` on an
+  `ext-notify` thread) with `tests/test_hotelui.py`, and a `!help` command that opens a
+  popup. CI's fake G-Earth run now covers `!help`.
+- `packets.md` section 12: live-verified `NotificationDialog` and `MOTDNotification`.
+- `gpython.md`: `send_to_client`, like `send_to_server`, returns None in g-python 0.1.6
+  and never raises; an unknown name only prints to stderr.
+- `bugs-and-workarounds.md` 3.8 (raw `<b>` tags) and 3.9 (window never shows).
+- `prompts.md` 1.9: prompt for adding in-client windows.
+
 ## 1.0.2, 2026-10-18
 
 - Works with any Agent Skills client (Claude Code, Codex, Gemini CLI, Cursor):

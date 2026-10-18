@@ -5,6 +5,8 @@ The example feature is a pair of chat commands typed by the user themselves:
 * ``!ping``: blocked (nobody else sees it), answered in G-Earth's console.
 * ``!say <text>``: blocked, then ``<text>`` is sent as normal chat through the paced
   outbox. Shows blocking, building a packet by name, and safe sending.
+* ``!help``: blocked, then a popup opens in the user's own client (``hotelui``). Only
+  they see it; G-Earth needs Developer mode on to pass it.
 
 Replace them with your own feature, keeping the shape: callbacks parse and queue,
 nothing slow or risky happens on G-Python's packet thread.
@@ -17,6 +19,7 @@ from typing import Any
 
 from .gpython import Direction, HMessage, HPacket
 from .guard import guarded, reset_reports
+from .hotelui import HotelNotifier, build_popup, escape
 from .outbox import Outbox
 from .protocol import ChatMode, build_chat, parse_outgoing_chat, parse_seconds
 
@@ -34,15 +37,19 @@ NEEDS = {
 class App:
     """Registers intercepts on an ``Extension`` and runs the example commands."""
 
-    def __init__(self, ext: Any, outbox: Outbox | None = None) -> None:
+    def __init__(
+        self, ext: Any, outbox: Outbox | None = None, hotel: HotelNotifier | None = None
+    ) -> None:
         """Wire up; nothing is sent until :meth:`register` and a game connection.
 
         Args:
             ext: The G-Python ``Extension`` (or a fake in tests).
             outbox: Paced sender; one sending to the server is made if not given.
+            hotel: Sender of windows to the user's client; made if not given.
         """
         self.ext = ext
         self.outbox = outbox or Outbox(self._send_to_server)
+        self.hotel = hotel or HotelNotifier(ext, fallback=lambda text: self.notice(text, "red"))
         self.connected = False
         self.client_type: str | None = None
 
@@ -56,6 +63,7 @@ class App:
         self.ext.on_event("connection_end", guarded(self.on_connection_end))
         self.ext.on_event("double_click", guarded(self.on_double_click))
         self.outbox.start()
+        self.hotel.start()
 
     # --- events ----------------------------------------------------------------
 
@@ -80,17 +88,18 @@ class App:
         if missing:
             self.notice(f"Unknown packet names for this client: {', '.join(missing)}", "red")
         else:
-            self.notice("Ready. Type !ping or !say <text>.", "blue")
+            self.notice("Ready. Type !help, !ping or !say <text>.", "blue")
 
     def on_connection_end(self) -> None:
         """Game disconnected: drop anything still queued."""
         self.connected = False
         self.outbox.clear()
+        self.hotel.clear()
         log.info("disconnected from the hotel")
 
     def on_double_click(self) -> None:
         """The user pressed ▶ on the extension in G-Earth."""
-        self.notice("Commands: !ping, !say <text>", "blue")
+        self.notice("Commands: !help, !ping, !say <text>", "blue")
 
     # --- packets ---------------------------------------------------------------
 
@@ -105,6 +114,8 @@ class App:
             self.notice("pong")
         elif command == "say" and rest.strip():
             self.outbox.enqueue(build_chat(rest.strip()[:100], chat.style, chat.tail or -1))
+        elif command == "help":
+            self.hotel.send(build_popup(self.help_text(), title="__TITLE__"))
         else:
             self.notice(f"Unknown command {PREFIX}{command}", "red")
 
@@ -115,6 +126,18 @@ class App:
         log.info("flood control: pausing sends for %ds", seconds)
 
     # --- helpers ---------------------------------------------------------------
+
+    def help_text(self) -> str:
+        """The ``!help`` popup text (popups read ``<b>`` and ``<font>``)."""
+        p = escape(PREFIX)
+        return "\n".join(
+            [
+                "<b>Commands</b> (nobody else sees them)",
+                f"<b>{p}ping</b> answers in G-Earth's console",
+                f"<b>{p}say</b> <i>text</i> says the text",
+                f"<b>{p}help</b> this window",
+            ]
+        )
 
     def known(self, direction: Direction, name: str) -> bool:
         """Whether G-Earth's packet catalogue for this client has ``name``."""

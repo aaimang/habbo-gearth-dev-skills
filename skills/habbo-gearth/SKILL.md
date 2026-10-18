@@ -1,12 +1,12 @@
 ---
 name: habbo-gearth
-description: Build, modify, debug, test and publish G-Earth extensions for Habbo (G-Python, G-Node, Java, G-Rust, xabbo), and read or write Habbo packets. Covers the extension protocol, packet names vs ids (Sulek), HabboPackets layouts and the live AIR client's drift from them, packet safety / Developer mode, threading rules, installing via command.txt, the macOS .DS_Store crash, G-ExtensionStore submission rules, and reusable templates, scripts and prompts. Use whenever a task mentions G-Earth, G-Python, g_python, HPacket, Habbo packets, headers, packet layouts or hex dumps, intercepting/blocking/injecting packets, a Habbo bot, Sulek, HabboPackets, G-ExtensionStore, extension.json, or a chat bot or room helper running through G-Earth, even if the user only says "my Habbo extension" or "the packet doesn't parse". For room variables over REST (the official WIRED Web API), use habbo-wired-api instead.
+description: Build, modify, debug, test and publish G-Earth extensions for Habbo (G-Python, G-Node, Java, G-Rust, xabbo), and read or write Habbo packets. Covers the extension protocol, packet names vs ids (Sulek), HabboPackets layouts and the live AIR client's drift from them, packet safety / Developer mode, threading rules, in-client bubbles and popups, installing via command.txt, the macOS .DS_Store crash, G-ExtensionStore submission rules, and reusable templates, scripts and prompts. Use whenever a task mentions G-Earth, G-Python, g_python, HPacket, Habbo packets, headers, packet layouts or hex dumps, intercepting/blocking/injecting packets, send_to_client, NotificationDialog, a popup or notification in the client, a Habbo bot, Sulek, HabboPackets, G-ExtensionStore, extension.json, or a chat bot or room helper running through G-Earth, even if the user only says "my Habbo extension" or "the packet doesn't parse". For room variables over REST (the official WIRED Web API), use habbo-wired-api instead.
 license: MIT
 compatibility: Agent Skills format (agentskills.io), e.g. Claude Code, Codex, Gemini CLI, Cursor. Scripts need Python 3.9+; G-Python development needs uv; packet lookups need network access (cached 7 days).
 metadata:
-  version: "1.0.2"
+  version: "1.1.0"
   release: V1
-  updated: "2026-10-18"
+  updated: "2026-10-19"
   verified-against: "G-Earth 1.5.4 (G-Realm moon), g-python 0.1.6, Habbo AIR MAC63 2026-10 builds, HabboPackets 2026-09, G-ExtensionStore repo/1.5.3"
 ---
 
@@ -136,6 +136,18 @@ and `logs/bad-packets/` directly rather than asking the user to paste. macOS G-E
 CI, update checker against `releases/latest`, a one-click updater that installs the
 **tag's** commit with the safety checks in bugs-and-workarounds 7.3-7.7.
 
+### G. Show something in the client
+No custom windows: only made-up incoming packets drawn by Habbo's own UI, seen by this
+user only, with Developer mode on (`references/client-ui.md`).
+1. Pick the window: `NotificationDialog` bubble (plain text, fades) for automatic
+   notices, popup (`display=POP_UP`: title, `<b>`/`<font>`, image, link-button) for
+   things the user asked for.
+2. Use the template's `hotelui.py` (`build_bubble`, `build_popup`, `escape`,
+   `HotelNotifier`): one notify thread, bounded queue, ~0.3 s gap, repeat throttle,
+   name check before sending, console fallback once per session.
+3. Owner commands: block the user's own `Chat`/`Shout`/`Whisper` when the first word is
+   the prefix, then queue the window. Escape any dynamic text in popups.
+
 ## Tools (stdlib Python 3.9+, run from anywhere)
 
 | Script | Use |
@@ -159,13 +171,14 @@ Data is cached in `~/.cache/habbo-gearth/` for 7 days (`--refresh` to re-downloa
 | `references/gearth-runtime.md` | protocol messages, `Extensions/` layout and paths per OS, Sulek, packet safety, expressions, install paths, lifecycle |
 | `references/packets.md` | wire format, the three notations (the `b` clash), source trust levels, the 5-step verification, chat/room/avatar packets, `Users`/`UserUpdate` live layouts, value tables |
 | `references/gpython.md` | G-Python API, threading model, proven architecture, traps and fixes, minimal example |
+| `references/client-ui.md` | showing bubbles, popups and other windows in the client: what's possible, live results with screenshots, images, rules |
 | `references/bugs-and-workarounds.md` | any symptom: triage tree + ~45 real failures with causes and fixes |
 | `references/testing-and-release.md` | test layers, fixtures, fake_gearth usage, live checklist, CI, SemVer, update delivery |
 | `references/extension-store.md` | publishing: rules, folder, every `extension.json` field, Python packaging, PR flow |
 | `references/frameworks.md` | choosing G-Python vs Java vs G-Node vs xabbo vs G-Rust |
 | `references/prompts.md` | ready-to-paste developer prompts; runtime system prompts for LLM chat features |
 | `references/repos.md` | links (checked), source files worth reading, the worked example |
-| `assets/gpython-template/` | the project template (protocol, guard, outbox, app, installer, tests) |
+| `assets/gpython-template/` | the project template (protocol, guard, outbox, hotelui, app, installer, tests) |
 
 ## Definition of done (extension change)
 
@@ -187,6 +200,6 @@ with secrets; ask before committing or pushing on someone's behalf.
 
 ## Versioning of this skill
 
-V1 (1.0.2, 2026-10-18). Changes are logged in `CHANGELOG.md`. When a fact here is
+V1 (1.1.0, 2026-10-19). Changes are logged in `CHANGELOG.md`. When a fact here is
 contradicted by a live capture or newer source, the capture wins: fix the reference,
 note the build and date, and bump the version.

@@ -13,7 +13,7 @@ in Claude Code, Codex, Gemini CLI, Cursor and any other agent that supports it.
 
 | Skill | Version | What it covers |
 |---|---|---|
-| [`habbo-gearth`](skills/habbo-gearth/) | 1.0.2 | G-Earth extensions end to end: the extension protocol, packet names vs ids (Sulek), HabboPackets layouts and how the live client differs from them, packet safety, G-Python threading rules, installing, the macOS `.DS_Store` crash, publishing to G-ExtensionStore. Comes with a tested G-Python project template and scripts to look up and decode packets, fake G-Earth for tests, scaffold projects and validate store entries |
+| [`habbo-gearth`](skills/habbo-gearth/) | 1.1.0 | G-Earth extensions end to end: the extension protocol, packet names vs ids (Sulek), HabboPackets layouts and how the live client differs from them, packet safety, G-Python threading rules, showing bubbles and popups inside the client, installing, the macOS `.DS_Store` crash, publishing to G-ExtensionStore. Comes with a tested G-Python project template and scripts to look up and decode packets, fake G-Earth for tests, scaffold projects and validate store entries |
 | [`habbo-wired-api`](skills/habbo-wired-api/) | 1.0.1 | The official WIRED Web API: room variables over REST, read/write keys, profiles, batch, bulk delete, Level Up maths, furni id conversion, 64-bit values, rate limits. Includes the API spec notes, wrapper notes and helper scripts |
 
 ## Install

@@ -55,6 +55,21 @@ class FakeOutbox:
         self.items.clear()
 
 
+class FakeHotel:
+    def __init__(self):
+        self.sent = []
+
+    def start(self):
+        pass
+
+    def send(self, packet):
+        self.sent.append(packet)
+        return True
+
+    def clear(self):
+        self.sent.clear()
+
+
 class Message:
     def __init__(self, packet):
         self.packet = packet
@@ -67,9 +82,9 @@ def own_chat(text: str) -> Message:
     return Message(pkt)
 
 
-def make(names=None):
+def make(names=None, hotel=None):
     ext, outbox = FakeExtension(names), FakeOutbox()
-    app = App(ext, outbox)
+    app = App(ext, outbox, hotel or FakeHotel())
     app.register()
     app.on_connection_start()
     return app, ext, outbox
@@ -104,6 +119,17 @@ def test_say_is_blocked_and_queued_not_sent_directly():
     ext.intercepts[(Direction.TO_SERVER, "Chat")](msg)
     assert msg.is_blocked and ext.sent == []  # never sent from the packet thread
     assert len(outbox.items) == 1 and outbox.items[0].incomplete_identifier == "Chat"
+
+
+def test_help_is_blocked_and_opens_a_popup():
+    hotel = FakeHotel()
+    _, ext, outbox = make(hotel=hotel)
+    msg = own_chat("!help")
+    ext.intercepts[(Direction.TO_SERVER, "Chat")](msg)
+    assert msg.is_blocked and not outbox.items
+    [popup] = hotel.sent
+    assert popup.incomplete_identifier == "NotificationDialog"
+    assert "<b>!help</b>" in popup.bytearray.decode("utf-8", "replace")
 
 
 def test_normal_chat_passes_through():

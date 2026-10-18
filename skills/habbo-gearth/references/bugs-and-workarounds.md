@@ -30,7 +30,7 @@ Is G-Earth's window open?
          ├─ no ─> name not in packet_infos (wrong name / wrong client type) (4.6), or the packet thread died (5.1)
          └─ yes
             Do sends arrive?
-            ├─ no ─> packet safety: Developer mode or do it once by hand (3.1)
+            ├─ no ─> packet safety: Developer mode or do it once by hand (3.1); client windows (3.9)
             └─ yes, but wrong ─> layout drift / encoding (section 4)
 ```
 
@@ -92,6 +92,17 @@ when whispers weren't sendable yet. Never fall back for private content.
 
 **3.7 HC-only actions do nothing.** Dances 2-4 and expressions 2/3/6 need Habbo Club.
 Make them opt-in; default to wave (1), thumbs up (7), dance 1.
+
+**3.8 A notification shows raw `<b>` tags.** You sent a bubble (`display=BUBBLE`) or a
+`MOTDNotification`; both print tags as text. Use `NotificationDialog` with
+`display=POP_UP`, which reads `<b>`, `<i>`, `<u>` and `<font color>`; keep bubbles plain.
+(`client-ui.md`)
+
+**3.9 A client window (bubble, popup, MOTD) never shows.** In order: Developer mode off
+(only tested with it on; turn it on in G-Earth's Extra tab); the name isn't in
+`ext.packet_infos[Direction.TO_CLIENT]` (g-python returns None and prints `Could not
+send incomplete packet` to stderr, nothing else); sent before `connection_start`. Check
+the name before sending and fall back to `write_to_console` once per session.
 
 ## 4. Parsing and the live client
 

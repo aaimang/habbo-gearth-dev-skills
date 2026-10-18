@@ -80,7 +80,19 @@ Keep packet names and layouts identical; map the threading model (one callback t
 paced outbox) to the target framework; keep the same tests as behaviour specs.
 ```
 
-### 1.9 Release
+### 1.9 Show something in the client
+```
+Using the habbo-gearth skill (references/client-ui.md), add in-client windows to
+<project>: <what to show, e.g. a /x help popup, a status popup, bubbles for errors>.
+Use NotificationDialog: bubbles (plain text) for automatic notices, POP_UP for things
+the user asks for. Escape dynamic text in popups. Send from one notify thread with a
+bounded queue and a gap, throttle repeats, check the name in packet_infos first and
+fall back to the G-Earth console once per session. Owner commands: block the user's own
+Chat/Shout/Whisper when the first word is the prefix. Tests with a fake Extension;
+README notes that Developer mode must be on.
+```
+
+### 1.10 Release
 ```
 Using the habbo-gearth skill, release <project> <X.Y.Z>: bump every version location,
 uv lock, ruff + pytest, then commit/tag/push only after I confirm. Write release notes
