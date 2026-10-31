@@ -115,6 +115,22 @@ generic `not-found`. Branch on these codes, not just the status.
 So: send strings (spec) but numbers work; always parse responses as strings; check
 `status`, not the presence of `error`, in batch results.
 
+### Errors (verified live 2026-10-31)
+
+| Request | Result |
+|---|---|
+| Any GET on a room with the add-on but no saved keys | 403 `wired.variables.key_missing`, even with a key sent |
+| Any request on a room without the add-on | 404 `not-found`, but a bad target kind still gives 400 `invalid_target` |
+| Unknown scope, or batch on a global variable | 404 with an empty body |
+| Non-numeric entity id | 404 `not-found`, before any key check |
+| `order_by` that is not a known field | 400 `invalid_target` |
+| PATCH value that is text, a decimal, a boolean or above int64 | 400 `request-failed-non-200`, before a missing variable is reported |
+| PATCH value null, or no body | 400 `wired.variables.invalid_value` |
+| Bulk delete with an empty list | 400 `wired.variables.bulk_delete_empty`, even with "Allow mass deletion" off |
+| Batch with an empty list | 400 `wired.variables.batch_empty`, before any key check |
+| Error answers | Carry an ETag, on writes too |
+| Default Python client User-Agent on habbo.com | HTTP 463, so send your own User-Agent |
+
 Still unverified: bulk-delete without "Allow mass deletion", PUT/DELETE behaviour,
 pets/bots/furni holder keys, rate limit numbers.
 
